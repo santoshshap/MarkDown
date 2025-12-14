@@ -4,7 +4,7 @@ from pathlib import Path
 from string import ascii_uppercase
 
 # Fill out this details and run the code
-WorkItemsNumber = 'WI00786995'
+WorkItemsNumber = 'WI0078699s'
 LanguageCode = 'EN'
 product = 'CargoWise'
 
@@ -21,16 +21,19 @@ LanguageCode = LanguageCode.upper()
 
 
 if not WorkItemsNumber.startswith('WI00'):
-    print("WorkItemsNumber must start with WI00, Please check the value, and run the code again")
+    print("❌ WorkItemsNumber must start with WI00, Please check the value, and run the code again")
     sys.exit(1)
 elif len(WorkItemsNumber) != 10:
-    print("WorkItemsNumber must be 10 characters, Please check the value, and run the code again")
+    print("❌ WorkItemsNumber must be 10 characters, Please check the value, and run the code again")
+    sys.exit(1)
+if not WorkItemsNumber[-8:].isdigit():
+    print("❌ Last 8 character of WorkItems must be number, Please check the value, and run the code again")
     sys.exit(1)
 elif len(LanguageCode) != 2:
-    print("LanguageCode must be 2 characters, Please check the value, and run the code again")
+    print("❌ LanguageCode must be 2 characters, Please check the value, and run the code again")
     sys.exit(1)
 elif not LanguageCode.isalpha():
-    print("LanguageCode must contain only letters, Please check the value, and run the code again")
+    print("❌ LanguageCode must contain only letters, Please check the value, and run the code again")
     sys.exit(1)
 
 template = Path("UpdateNoteTemplate.md")
