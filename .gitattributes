@@ -1,0 +1,7 @@
+# Show 'Markdown' in GitHub language stats for the repo. (see: https://github.com/github-linguist/linguist/blob/main/docs/overrides.md#summary)
+*.md linguist-documentation=false
+*.md linguist-detectable
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.svg filter=lfs diff=lfs merge=lfs -text
