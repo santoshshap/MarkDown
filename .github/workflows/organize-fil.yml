@@ -1,4 +1,4 @@
-name: Organize existing WI folder
+name: Organize WI folder (create next letter)
 
 on:
   workflow_dispatch:
@@ -16,16 +16,12 @@ on:
         required: true
         type: string
       FolderToOrganize:
-        description: "e.g. new"
+        description: "e.g. new (folder under product)"
         required: true
         type: string
       BranchName:
         description: "Branch to write changes to (created if missing)"
         required: true
-        type: string
-      Letter:
-        description: "Optional: force letter A-Z. Leave blank to pick latest."
-        required: false
         type: string
 
 permissions:
@@ -69,14 +65,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run organizer
+      - name: Run organizer (main script)
         run: |
           python /tmp/folderOrganizer.py \
             --folder_to_organize "${{ inputs.FolderToOrganize }}" \
             --work_item "${{ inputs.WorkItemsNumber }}" \
             --language "${{ inputs.LanguageCode }}" \
             --product "${{ inputs.product }}" \
-            ${{ inputs.Letter && format('--letter {0}', inputs.Letter) || '' }}
+            --scan_root "_main"
 
       - name: Commit and push
         run: |
