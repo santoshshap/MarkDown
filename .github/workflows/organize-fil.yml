@@ -1,4 +1,4 @@
-name: Organize folder
+name: Organize existing WI folder
 
 on:
   workflow_dispatch:
@@ -23,20 +23,29 @@ on:
         description: "Branch to write changes to (created if missing)"
         required: true
         type: string
+      Letter:
+        description: "Optional: force letter A-Z. Leave blank to pick latest."
+        required: false
+        type: string
 
 permissions:
   contents: write
 
 jobs:
-  generate:
+  organize:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main (workflow source)
+      - name: Checkout main (source of truth for script)
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
-      - name: Create or switch to target branch
+      - name: Save organizer script from main
+        run: |
+          cp folderOrganizer.py /tmp/folderOrganizer.py
+
+      - name: Switch/create target branch
         run: |
           set -e
           BR="${{ inputs.BranchName }}"
@@ -48,18 +57,26 @@ jobs:
             git checkout -b "$BR"
           fi
 
+      - name: Add main worktree for scanning
+        run: |
+          set -e
+          git fetch origin main
+          rm -rf _main || true
+          git worktree add _main origin/main
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Run script
+      - name: Run organizer
         run: |
-          python folderOrganizer.py \
+          python /tmp/folderOrganizer.py \
             --folder_to_organize "${{ inputs.FolderToOrganize }}" \
             --work_item "${{ inputs.WorkItemsNumber }}" \
             --language "${{ inputs.LanguageCode }}" \
-            --product "${{ inputs.product }}"
+            --product "${{ inputs.product }}" \
+            ${{ inputs.Letter && format('--letter {0}', inputs.Letter) || '' }}
 
       - name: Commit and push
         run: |
@@ -71,5 +88,5 @@ jobs:
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "Create folder for ${{ inputs.WorkItemsNumber }}-${{ inputs.LanguageCode }}"
+          git commit -m "Organize folder for ${{ inputs.WorkItemsNumber }}-${{ inputs.LanguageCode }}"
           git push -u origin "${{ inputs.BranchName }}"
