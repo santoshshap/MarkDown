@@ -1,0 +1,75 @@
+name: Create WI folder structure
+
+on:
+  workflow_dispatch:
+    inputs:
+      WorkItemsNumber:
+        description: "e.g. WI00001111"
+        required: true
+        type: string
+      LanguageCode:
+        description: "e.g. EN"
+        required: true
+        type: string
+      product:
+        description: "e.g. CargoWise"
+        required: true
+        type: string
+      FolderToOrganize:
+        description: "e.g. new"
+        required: true
+        type: string
+      BranchName:
+        description: "Branch to write changes to (created if missing)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main (workflow source)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create or switch to target branch
+        run: |
+          set -e
+          BR="${{ inputs.BranchName }}"
+          git fetch origin "$BR" || true
+          if git ls-remote --exit-code --heads origin "$BR" > /dev/null 2>&1; then
+            git checkout "$BR"
+            git pull origin "$BR"
+          else
+            git checkout -b "$BR"
+          fi
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run script
+        run: |
+          python folderOrganizer.py \
+            --folder_to_organize "${{ inputs.FolderToOrganize }}" \
+            --work_item "${{ inputs.WorkItemsNumber }}" \
+            --language "${{ inputs.LanguageCode }}" \
+            --product "${{ inputs.product }}"
+
+      - name: Commit and push
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Create folder for ${{ inputs.WorkItemsNumber }}-${{ inputs.LanguageCode }}"
+          git push -u origin "${{ inputs.BranchName }}"
