@@ -49,7 +49,7 @@ jobs:
 
       - name: Run folder generator
         run: |
-          python scripts/create_wi_folder.py \
+          python folderCreater.py \
             --work_item "${{ inputs.WorkItemsNumber }}" \
             --language "${{ inputs.LanguageCode }}" \
             --product "${{ inputs.product }}"
