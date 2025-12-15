@@ -2,45 +2,7 @@ import sys
 import shutil
 from pathlib import Path
 from string import ascii_uppercase
-
-# Fill out this details and run the code
-WorkItemsNumber = 'WI00777777'
-LanguageCode = 'EN'
-product = 'CargoWise'
-
-
-
-
-#------------------------------------------------------------------------
-# Code start from here (Do not change)
-#------------------------------------------------------------------------
-
-# ---- Change Case ----
-WorkItemsNumber = WorkItemsNumber.upper()
-LanguageCode = LanguageCode.upper()
-
-
-if not WorkItemsNumber.startswith('WI00'):
-    print("❌ WorkItemsNumber must start with WI00, Please check the value, and run the code again")
-    sys.exit(1)
-elif len(WorkItemsNumber) != 10:
-    print("❌ WorkItemsNumber must be 10 characters, Please check the value, and run the code again")
-    sys.exit(1)
-if not WorkItemsNumber[-8:].isdigit():
-    print("❌ Last 8 character of WorkItems must be number, Please check the value, and run the code again")
-    sys.exit(1)
-elif len(LanguageCode) != 2:
-    print("❌ LanguageCode must be 2 characters, Please check the value, and run the code again")
-    sys.exit(1)
-elif not LanguageCode.isalpha():
-    print("❌ LanguageCode must contain only letters, Please check the value, and run the code again")
-    sys.exit(1)
-
-template = Path("UpdateNoteTemplate.md")
-
-# ---- Helpers ----
-def folder_exists(folder_path: Path) -> bool:
-    return folder_path.is_dir()
+import argparse
 
 def get_next_folder(work_item: str, language: str, root_dir: Path) -> Path:
     for letter in ascii_uppercase:  # 'A' .. 'Z'
@@ -49,41 +11,44 @@ def get_next_folder(work_item: str, language: str, root_dir: Path) -> Path:
             return candidate
     raise ValueError("No free letter (A–Z) left for this WorkItemsNumber")
 
-# ---- Main logic ----
-root = Path(product)
-baseFolder = root / f'{WorkItemsNumber}-A'
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--work_item", required=True)
+    p.add_argument("--language", required=True)
+    p.add_argument("--product", required=True)
+    p.add_argument("--template", default="UpdateNoteTemplate.md")
+    args = p.parse_args()
 
-folder_path = get_next_folder(WorkItemsNumber, LanguageCode, root)  # <-- this is a Path
+    WorkItemsNumber = args.work_item.upper()
+    LanguageCode = args.language.upper()
+    product = args.product
 
+    if not WorkItemsNumber.startswith("WI00") or len(WorkItemsNumber) != 10 or not WorkItemsNumber[-8:].isdigit():
+        print("❌ WorkItemsNumber must look like WI00######## (10 chars)")
+        sys.exit(1)
+    if len(LanguageCode) != 2 or not LanguageCode.isalpha():
+        print("❌ LanguageCode must be 2 letters")
+        sys.exit(1)
 
-if folder_exists(baseFolder):
-    print(f"Folder {baseFolder} already exists.")
-    signal = input(
-        f"Type yes (y) to continue, this will create a new {folder_path}, "
-        "else change the WorkItemsNumber or LanguageCode and run again: "
-    )
-    while signal.lower() not in ['y', 'yes']:
-        signal = input("Invalid input, Type yes (y) to continue, else change the WorkItemsNumber or LanguageCode and run again: ")
-else:
-    print(f"Creating new folder: {folder_path}")
-    signal = input("Type yes (y) to continue: ")
-    while signal.lower() not in ['y', 'yes']:
-        signal = input("Invalid input, Type yes (y) to continue, or re-run the code with different WorkItemsNumber or LanguageCode: ")
+    template = Path(args.template)
+    if not template.exists():
+        print(f"❌ Template not found: {template}")
+        sys.exit(1)
 
+    root = Path(product)
+    folder_path = get_next_folder(WorkItemsNumber, LanguageCode, root)
 
-print(folder_path)
+    folder_path.mkdir(parents=True, exist_ok=True)
 
-# Actually create the folder
-folder_path.mkdir(parents=True, exist_ok=True)
+    new_name = f"{folder_path.name}.md"
+    shutil.copy2(template, folder_path / new_name)
 
-new_name = f"{folder_path.name}.md"  
-shutil.copy2(template, folder_path / new_name)
+    image_folder = folder_path / "_images"
+    image_folder.mkdir(parents=True, exist_ok=True)
 
-# Copy template 
+    print(f"✅ Created: {folder_path}")
+    print(f"✅ Copied template to: {folder_path / new_name}")
+    print(f"✅ Created images folder: {image_folder}")
 
-
-# Create _images subfolder
-image_folder = folder_path / '_images'
-image_folder.mkdir(parents=True, exist_ok=True)
-
-print(f"Folder {folder_path} created successfully with {new_name} copied and _images folder created.")
+if __name__ == "__main__":
+    main()
