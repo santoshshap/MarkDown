@@ -3,42 +3,11 @@ import shutil
 from pathlib import Path
 from string import ascii_uppercase
 import re
+import argparse
+from urllib.parse import urlsplit
 
-# Fill out this details and run the code
-FolderToOrganize = 'new'
-WorkItemsNumber = 'wi00001247'
-LanguageCode = 'en'
-product = 'CargoWise'
-
-
-#------------------------------------------------------------------------
-# Code start from here (Do not change)
-#------------------------------------------------------------------------
-
-# ---- Change Case ----
-WorkItemsNumber = WorkItemsNumber.upper()
-LanguageCode = LanguageCode.upper()
-
-
-if not WorkItemsNumber.startswith('WI0000'):
-    print("WorkItemsNumber must start with WI0000, Please check the value, and run the code again")
-    sys.exit(1)
-elif len(WorkItemsNumber) != 10:
-    print("WorkItemsNumber must be 10 characters, Please check the value, and run the code again")
-    sys.exit(1)
-elif len(LanguageCode) != 2:
-    print("LanguageCode must be 2 characters, Please check the value, and run the code again")
-    sys.exit(1)
-elif not LanguageCode.isalpha():
-    print("LanguageCode must contain only letters, Please check the value, and run the code again")
-    sys.exit(1)
-
-
-# ---- Helpers ----
 def folder_exists(folder_path: Path) -> bool:
     return folder_path.is_dir()
-
-
 
 def get_next_folder(work_item: str, language: str, root_dir: Path) -> Path:
     for letter in ascii_uppercase:  # 'A' .. 'Z'
@@ -47,76 +16,99 @@ def get_next_folder(work_item: str, language: str, root_dir: Path) -> Path:
             return candidate
     raise ValueError("No free letter (A–Z) left for this WorkItemsNumber")
 
-# ---- Main logic ----
-root = Path(product)
-baseFolder = root / f'{WorkItemsNumber}-A'
+def basename_from_src(src: str) -> str:
+    src = src.strip()
+    path = urlsplit(src).path  # strips ?query/#fragment
+    return Path(path).name
 
-folder_path = get_next_folder(WorkItemsNumber, LanguageCode, root)  
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--folder_to_organize", required=True)  # e.g. new
+    p.add_argument("--work_item", required=True)          # e.g. WI00001111
+    p.add_argument("--language", required=True)           # e.g. EN
+    p.add_argument("--product", required=True)            # e.g. CargoWise
+    args = p.parse_args()
 
-if folder_exists(baseFolder):
-    print(f"Folder {baseFolder} already exists.")
-    signal = input(
-        f"Type yes (y) to continue, this will create a new {folder_path}, "
-        "else change the WorkItemsNumber or LanguageCode and run again: "
-    )
-    while signal.lower() not in ['y', 'yes']:
-        signal = input("Invalid input, Type yes (y) to continue, else change the WorkItemsNumber or LanguageCode and run again: ")
-else:
-    print(f"Creating new folder: {folder_path}")
-    signal = input("Type yes (y) to continue: ")
-    while signal.lower() not in ['y', 'yes']:
-        signal = input("Invalid input, Type yes (y) to continue, or re-run the code with different WorkItemsNumber or LanguageCode: ")
+    FolderToOrganize = args.folder_to_organize
+    WorkItemsNumber = args.work_item.upper()
+    LanguageCode = args.language.upper()
+    product = args.product
 
-# Actually create the folder
-folder_path.mkdir(parents=True, exist_ok=True)
+    # Validation (kept close to your original)
+    if not WorkItemsNumber.startswith("WI0000"):
+        print("WorkItemsNumber must start with WI0000")
+        sys.exit(1)
+    if len(WorkItemsNumber) != 10:
+        print("WorkItemsNumber must be 10 characters")
+        sys.exit(1)
+    if len(LanguageCode) != 2 or (not LanguageCode.isalpha()):
+        print("LanguageCode must be 2 letters")
+        sys.exit(1)
 
-# Copy template 
-source_folder = Path(f"{product}/{FolderToOrganize}")
+    root = Path(product)
+    baseFolder = root / f"{WorkItemsNumber}-A"
 
-# Create _images subfolder
-image_folder = folder_path / '_images'
-image_folder.mkdir(parents=True, exist_ok=True)
-image_extensions = ["*.jpg", "*.jpeg", "*.png", "*.svg", "*.tiff", "*.gif", "*.bmp", "*.webp"]
+    # Non-interactive behavior:
+    # - always create next available letter folder
+    folder_path = get_next_folder(WorkItemsNumber, LanguageCode, root)
 
-# Copy each image found in the source folder
-for pattern in image_extensions:
-    for img_file in source_folder.glob(pattern):
-        shutil.copy2(img_file, image_folder / img_file.name)
-        print(f"Copied image: {img_file.name} → {image_folder}")
+    folder_path.mkdir(parents=True, exist_ok=True)
 
+    source_folder = Path(f"{product}/{FolderToOrganize}")
+    if not source_folder.exists():
+        print(f"Source folder not found: {source_folder}")
+        sys.exit(1)
 
-# 2. Process and copy .md files
-img_md_pattern = re.compile(r'!\[(?P<alt>.*?)\]\((?P<path>[^)]+)\)')
+    # Create _images
+    image_folder = folder_path / "_images"
+    image_folder.mkdir(parents=True, exist_ok=True)
 
-for md_file in source_folder.glob("*.md"):
-    # Read original markdown
-    text = md_file.read_text(encoding="utf-8")
+    image_extensions = ["*.jpg", "*.jpeg", "*.png", "*.svg", "*.tiff", "*.gif", "*.bmp", "*.webp"]
 
-    # Replace image paths: any path -> _images/<basename>
-    def replace_md_image(match: re.Match) -> str:
-        alt = match.group('alt')
-        orig_path = match.group('path').strip()
+    # Collect + sort images (deterministic order)
+    all_images = []
+    for pattern in image_extensions:
+        all_images.extend(source_folder.glob(pattern))
+    all_images = sorted(all_images, key=lambda p: p.name.lower())
 
-        # Take just the filename part, drop any subfolders
-        filename = Path(orig_path).name
-        new_path = f"_images/{filename}"
+    rename_map = {}  # old_name -> "<folder_path.name>.<i>.ext"
+    for i, img_file in enumerate(all_images, start=1):
+        new_img_name = f"{folder_path.name}.{i}{img_file.suffix.lower()}"
+        rename_map[img_file.name] = new_img_name
+        shutil.copy2(img_file, image_folder / new_img_name)
+        print(f"Copied image: {img_file.name} → {new_img_name}")
 
-        return f"![{alt}]({new_path})"
+    # Update markdown files
+    img_md_pattern = re.compile(r"!\[(?P<alt>.*?)\]\((?P<path>[^)]+)\)")
 
-    new_text = img_md_pattern.sub(replace_md_image, text)
+    for md_file in source_folder.glob("*.md"):
+        text = md_file.read_text(encoding="utf-8")
 
-    #Handle HTML <img src="..."> tags
-    new_text = re.sub(
-        r'(<img\s+[^>]*src=["\'])([^"\']+)(["\'])',
-        lambda m: m.group(1) + f"_images/{Path(m.group(2)).name}" + m.group(3),
-        new_text,
-    )
+        def replace_md_image(match: re.Match) -> str:
+            alt = match.group("alt")
+            orig_path = match.group("path").strip()
+            old_name = basename_from_src(orig_path)
+            new_name = rename_map.get(old_name, old_name)
+            return f"![{alt}](_images/{new_name})"
 
+        new_text = img_md_pattern.sub(replace_md_image, text)
 
-    new_name = f"{folder_path.name}.md"  
-    dest_md = folder_path / new_name
+        # Handle HTML <img src="...">
+        def replace_html_img(m: re.Match) -> str:
+            old_name = basename_from_src(m.group(2))
+            new_name = rename_map.get(old_name, old_name)
+            return m.group(1) + f"_images/{new_name}" + m.group(3)
 
-    # Write processed markdown instead of copying raw file
-    dest_md.write_text(new_text, encoding="utf-8")
+        new_text = re.sub(
+            r'(<img\s+[^>]*src=["\'])([^"\']+)(["\'])',
+            replace_html_img,
+            new_text,
+        )
 
-print(f"Markdown and images processed into: {folder_path}")
+        dest_md = folder_path / f"{folder_path.name}.md"
+        dest_md.write_text(new_text, encoding="utf-8")
+
+    print(f"Done. Output folder: {folder_path}")
+
+if __name__ == "__main__":
+    main()
