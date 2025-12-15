@@ -1,4 +1,4 @@
-name: Create WI folder structure
+name: Organize folder
 
 on:
   workflow_dispatch:
