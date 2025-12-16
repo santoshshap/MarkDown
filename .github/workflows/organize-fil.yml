@@ -18,7 +18,10 @@ on:
       FolderToOrganize:
         description: "e.g. new_folder (folder under product to organize)"
         required: true
-        type: string
+        type: choice
+        options:
+          - CargoWise
+          - BorderWise
       BranchName:
         description: "Branch to write changes to (created if missing)"
         required: true
