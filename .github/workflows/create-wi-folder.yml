@@ -14,9 +14,12 @@ on:
       product:
         description: "Product (either CargoWise or BorderWise)"
         required: true
-        type: string
+        type: choice
+        options:
+          - CargoWise
+          - BorderWise
       BranchName:
-        description: "Branch to create folder (Workflow creats new branch if missing)"
+        description: "Branch to create folder (Workflow creates new branch if missing)"
         required: true
         type: string
 
@@ -27,6 +30,26 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate inputs
+        shell: bash
+        run: |
+          set -e
+
+          WI="${{ inputs.WorkItemsNumber }}"
+          LANG="${{ inputs.LanguageCode }}"
+
+          # Work item: WI00###### (10 chars total)
+          if [[ ! "$WI" =~ ^WI00[0-9]{6}$ ]]; then
+            echo "::error::WorkItemsNumber must match WI00###### (e.g., WI00123456)"
+            exit 1
+          fi
+
+          # Language: 2 letters
+          if [[ ! "$LANG" =~ ^[A-Za-z]{2}$ ]]; then
+            echo "::error::LanguageCode must be exactly 2 letters (e.g., EN)"
+            exit 1
+          fi
+
       - name: Checkout main (source of truth for the script)
         uses: actions/checkout@v4
         with:
@@ -34,6 +57,7 @@ jobs:
           fetch-depth: 0
 
       - name: Create or switch to target branch (but keep script from main)
+        shell: bash
         run: |
           set -e
           BR="${{ inputs.BranchName }}"
@@ -66,6 +90,7 @@ jobs:
             --product "${{ inputs.product }}"
 
       - name: Commit and push
+        shell: bash
         run: |
           set -e
           git config user.name "github-actions[bot]"
@@ -77,4 +102,3 @@ jobs:
           fi
           git commit -m "Create folder for ${{ inputs.WorkItemsNumber }}-${{ inputs.LanguageCode }}"
           git push -u origin "${{ inputs.BranchName }}"
-
