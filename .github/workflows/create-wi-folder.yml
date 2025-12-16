@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       LanguageCode:
-        description: "Language code (must be two characters e.g. EN"
+        description: "Language code (must be two characters e.g. EN)"
         required: true
         type: string
       product:
@@ -16,7 +16,7 @@ on:
         required: true
         type: string
       BranchName:
-        description: "Branch create folder (Workflow creats new branch if missing)"
+        description: "Branch to create folder (Workflow creats new branch if missing)"
         required: true
         type: string
 
