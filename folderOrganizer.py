@@ -15,19 +15,13 @@ def basename_from_src(src: str) -> str:
     path = urlsplit(src).path  # strips ?query/#fragment
     return Path(path).name
 
-
 def validate_inputs(work_item: str, language: str) -> None:
-    if not work_item.startswith("WI0000"):
-        print("❌ WorkItemsNumber must start with WI0000")
-        sys.exit(1)
-    if len(work_item) != 10 or not work_item[-5:].isdigit():
-        # original required len==10; your earlier versions also required digits at end
-        print("❌ WorkItemsNumber must be 10 chars (e.g., WI00001111)")
+    if not work_item.startswith("WI00") or len(work_item) != 10 or not work_item[-8:].isdigit():
+        print("❌ WorkItemsNumber must look like WI00######## (10 chars)")
         sys.exit(1)
     if len(language) != 2 or not language.isalpha():
         print("❌ LanguageCode must be 2 letters")
         sys.exit(1)
-
 
 def candidate_rel_path(work_item: str, letter: str, language: str) -> str:
     return f"{work_item}-{letter}/{work_item}-{letter}-{language}-{language}"
