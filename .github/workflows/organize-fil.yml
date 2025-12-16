@@ -14,14 +14,15 @@ on:
       product:
         description: "Product (either CargoWise or BorderWise)"
         required: true
-        type: string
-      FolderToOrganize:
-        description: "e.g. new_folder (folder under product to organize)"
-        required: true
         type: choice
         options:
           - CargoWise
           - BorderWise
+      FolderToOrganize:
+        description: "e.g. new_folder (folder under product to organize)"
+        required: true
+        type: string
+       
       BranchName:
         description: "Branch to write changes to (created if missing)"
         required: true
