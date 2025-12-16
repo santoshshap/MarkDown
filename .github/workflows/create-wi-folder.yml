@@ -4,19 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       WorkItemsNumber:
-        description: "e.g. WI00777777"
+        description: "WorkItems number (e.g. WI00123456)"
         required: true
         type: string
       LanguageCode:
-        description: "e.g. EN"
+        description: "Language code (must be two characters e.g. EN"
         required: true
         type: string
       product:
-        description: "e.g. CargoWise"
+        description: "Product (either CargoWise or BorderWise)"
         required: true
         type: string
       BranchName:
-        description: "Branch to write changes to (created if missing)"
+        description: "Branch create folder (Workflow creats new branch if missing)"
         required: true
         type: string
 
