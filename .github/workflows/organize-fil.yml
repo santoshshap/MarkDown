@@ -4,19 +4,19 @@ on:
   workflow_dispatch:
     inputs:
       WorkItemsNumber:
-        description: "e.g. WI00001111"
+        description: "WorkItems number (e.g. WI00123456"
         required: true
         type: string
       LanguageCode:
-        description: "e.g. EN"
+        description: "Language code (must be two characters e.g. EN)"
         required: true
         type: string
       product:
-        description: "e.g. CargoWise"
+        description: "Product (either CargoWise or BorderWise)"
         required: true
         type: string
       FolderToOrganize:
-        description: "e.g. new (folder under product)"
+        description: "e.g. new_folder (folder under product to organize)"
         required: true
         type: string
       BranchName:
