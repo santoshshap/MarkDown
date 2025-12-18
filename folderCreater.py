@@ -37,13 +37,15 @@ def main():
 
     work_item = args.work_item.upper()
     language = args.language.upper()
+
+    language = language[language.find("(")+1 : language.rfind(")")]
     product = args.product
 
     if not work_item.startswith("WI00") or len(work_item) != 10 or not work_item[-8:].isdigit():
         print("❌ WorkItemsNumber must look like WI00######## (10 chars)")
         sys.exit(1)
-    if len(language) != 2 or not language.isalpha():
-        print("❌ LanguageCode must be 2 letters")
+    if len(language) != 5 or not language.isalpha():
+        print("❌ LanguageCode must be 5 letters, XX-XX")
         sys.exit(1)
 
     template = Path(args.template)
