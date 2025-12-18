@@ -16,7 +16,7 @@ def get_next_folder(work_item: str, language: str, product: str, create_root: Pa
     scan_product_root = scan_root / product
 
     for letter in ascii_uppercase:  # 'A' .. 'Z'
-        candidate_rel = f"{work_item}-{letter}/{work_item}-{letter}-{language}-{language}"
+        candidate_rel = f"{work_item}-{letter}/{work_item}-{letter}-{language}"
 
         candidate_create = create_product_root / candidate_rel
         candidate_on_main = scan_product_root / candidate_rel
@@ -37,15 +37,14 @@ def main():
 
     work_item = args.work_item.upper()
     language = args.language.upper()
+
+    language = language[language.find("(")+1 : language.rfind(")")]
     product = args.product
 
     if not work_item.startswith("WI00") or len(work_item) != 10 or not work_item[-8:].isdigit():
         print("❌ WorkItemsNumber must look like WI00######## (10 chars)")
         sys.exit(1)
-    if len(language) != 2 or not language.isalpha():
-        print("❌ LanguageCode must be 2 letters")
-        sys.exit(1)
-
+        
     template = Path(args.template)
     if not template.exists():
         print(f"❌ Template not found: {template}")
