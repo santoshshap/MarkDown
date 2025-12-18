@@ -12,12 +12,12 @@ on:
         required: true
         type: choice
         options:
+        - English US (EN-US)
         - Chinese Simplified (ZH-CN)
         - Chinese Traditional (ZH-TW)
         - Dutch (NL-NL)
         - English (undefined variation) (EN-EN)
         - English GB (EN-GB)
-        - English US (EN-US)
         - French (FR-FR)
         - German (DE-DE)
         - Italian (IT-IT)
