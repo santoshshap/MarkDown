@@ -62,12 +62,6 @@ jobs:
             exit 1
           fi
 
-          # Language: 2 letters
-          if [[ ! "$LANG" =~ ^[A-Za-z]{2}$ ]]; then
-            echo "::error::LanguageCode must be exactly 2 letters (e.g., EN)"
-            exit 1
-          fi
-
       - name: Checkout main (source of truth for the script)
         uses: actions/checkout@v4
         with:
