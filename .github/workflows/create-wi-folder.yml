@@ -10,7 +10,25 @@ on:
       LanguageCode:
         description: "Language code (must be two characters e.g. EN)"
         required: true
-        type: string
+        type: choice
+        options:
+        - Chinese Simplified (ZH-CN)
+        - Chinese Traditional (ZH-TW)
+        - Dutch (NL-NL)
+        - English (undefined variation) (EN-EN)
+        - English GB (EN-GB)
+        - English US (EN-US)
+        - French (FR-FR)
+        - German (DE-DE)
+        - Italian (IT-IT)
+        - Japanese (JA-JP)
+        - Korean (KR-KR)
+        - Polish (PL-PL)
+        - Portuguese (PT-PT)
+        - Portuguese Brazil (PT-BR)
+        - Spanish (ES-ES)
+        - Spanish Latin American (ES-LA)
+        - Turkish (TR-TR)
       product:
         description: "Product (either CargoWise or BorderWise)"
         required: true
