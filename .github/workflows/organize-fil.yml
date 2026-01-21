@@ -1,23 +1,40 @@
-name: Organize WI folder (create next letter)
+name: Folder and file organizer
 
 on:
   workflow_dispatch:
     inputs:
       WorkItemsNumber:
-        description: "WorkItems number (e.g. WI00123456"
+        description: >
+          Review the guides in this repo before use.
+          ________________________________
+          Update Note Work Item number (e.g. WI01002345)
         required: true
         type: string
-      LanguageCode:
-        description: "Language code (must be two characters e.g. EN)"
+
+      product:
+        description: "Product Category where the new Update Note folder was added."
         required: true
         type: choice
         options:
-        - English US (EN-US)
+          - CargoWise
+          - BorderWise
+
+      FolderToOrganize:
+        description: "Current name of the new Update Note folder."
+        required: true
+        type: string
+
+      LanguageCode:
+        description: "Select the language code from the following options:"
+        required: true
+        type: choice
+        options:
+        - English (EN-EN)
         - Chinese Simplified (ZH-CN)
         - Chinese Traditional (ZH-TW)
         - Dutch (NL-NL)
-        - English (undefined variation) (EN-EN)
         - English GB (EN-GB)
+        - English US (EN-US)
         - French (FR-FR)
         - German (DE-DE)
         - Italian (IT-IT)
@@ -29,22 +46,6 @@ on:
         - Spanish (ES-ES)
         - Spanish Latin American (ES-LA)
         - Turkish (TR-TR)
-      product:
-        description: "Product (either CargoWise or BorderWise)"
-        required: true
-        type: choice
-        options:
-          - CargoWise
-          - BorderWise
-      FolderToOrganize:
-        description: "e.g. new_folder (folder under product to organize)"
-        required: true
-        type: string
-       
-      BranchName:
-        description: "Branch to write changes to (created if missing)"
-        required: true
-        type: string
 
 permissions:
   contents: write
@@ -66,7 +67,7 @@ jobs:
       - name: Switch/create target branch
         run: |
           set -e
-          BR="${{ inputs.BranchName }}"
+          BR="${{ github.ref_name }}"
           git fetch origin "$BR" || true
           if git ls-remote --exit-code --heads origin "$BR" > /dev/null 2>&1; then
             git checkout "$BR"
