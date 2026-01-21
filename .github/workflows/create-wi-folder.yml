@@ -4,9 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       WorkItemsNumber:
-        description: "Review the guides in this repo before use."
-        "All fields must be completed."
-        "WorkItems number (e.g. WI00123456)"
+        description: >
+          Review the guides in this repo before use.
+          All fields must be completed.
+               
+          WorkItems number (e.g. WI00123456)
         required: true
         type: string
       LanguageCode:
