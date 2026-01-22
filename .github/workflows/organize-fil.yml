@@ -51,11 +51,6 @@ on:
         - Spanish (ES-ES)
         - Spanish Latin American (ES-LA)
         - Turkish (TR-TR)
-    
-      LanguageVariant:
-        description: "Language variation (A-Z, auto picked if left blank)"
-        required: false
-        type: string
 
 permissions:
   contents: write
@@ -104,8 +99,7 @@ jobs:
             --folder_to_organize "${{ inputs.FolderToOrganize }}" \
             --work_item "${{ inputs.WorkItemsNumber }}" \
             --language "${{ inputs.LanguageCode }}" \
-            --product "${{ inputs.product }}" \
-            --language_variant "${{ inputs.LanguageVariant }}" \            
+            --product "${{ inputs.product }}" \         
             --scan_root "_main"
 
       - name: Commit and push
