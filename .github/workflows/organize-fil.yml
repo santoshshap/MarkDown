@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       WorkItemsNumber:
-        description: >
+        description: |
           Review the guides in this repo before use.
-          ________________________________
-          Update Note Work Item number (e.g. WI01002345)
+          All fields must be completed.
+          ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ‎‎‎
+          UPN Work Item number (e.g. WI01002345)
         required: true
         type: string
-
+                
       BranchName:
         description: "The name of the branch containing the new Update Note folder."
         required: true
