@@ -77,7 +77,7 @@ jobs:
       - name: Switch/create target branch
         run: |
           set -e
-          BR="${{ github.ref_name }}"
+          BR="${{ inputs.BranchName }}"
           git fetch origin "$BR" || true
           if git ls-remote --exit-code --heads origin "$BR" > /dev/null 2>&1; then
             git checkout "$BR"
