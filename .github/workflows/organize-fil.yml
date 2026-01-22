@@ -11,6 +11,11 @@ on:
         required: true
         type: string
 
+      BranchName:
+        description: "The name of the branch containing the new Update Note folder."
+        required: true
+        type: string
+
       product:
         description: "Product Category where the new Update Note folder was added."
         required: true
@@ -46,6 +51,11 @@ on:
         - Spanish (ES-ES)
         - Spanish Latin American (ES-LA)
         - Turkish (TR-TR)
+    
+      LanguageVariant:
+        description: "Language variation (A-Z, auto picked if left blank)"
+        required: false
+        type: string
 
 permissions:
   contents: write
