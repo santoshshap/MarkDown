@@ -1,4 +1,4 @@
-name: Create WI folder structure
+name: Folder and file creator
 
 on:
   workflow_dispatch:
@@ -7,21 +7,36 @@ on:
         description: >
           Review the guides in this repo before use.
           All fields must be completed.
-               
-          WorkItems number (e.g. WI00123456)
+          ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ 
+          UPN Work Item number (e.g. WI01002345)
         required: true
         type: string
-      LanguageCode:
-        description: "Language code (must be two characters e.g. EN)"
+
+      BranchName:
+        description: "Name of the new or existing branch for the UPN folder. "
+        required: true
+        type: string
+
+      product:
+        description: "Select the product area for this Update Note."
         required: true
         type: choice
         options:
-        - English US (EN-US)
+          - CargoWise
+          - BorderWise
+
+      
+      LanguageCode:
+        description: "Select the language code from the following options."
+        required: true
+        type: choice
+        options:
+        - English (EN-EN)
         - Chinese Simplified (ZH-CN)
         - Chinese Traditional (ZH-TW)
         - Dutch (NL-NL)
-        - English (undefined variation) (EN-EN)
         - English GB (EN-GB)
+        - English US (EN-US)
         - French (FR-FR)
         - German (DE-DE)
         - Italian (IT-IT)
@@ -33,17 +48,9 @@ on:
         - Spanish (ES-ES)
         - Spanish Latin American (ES-LA)
         - Turkish (TR-TR)
-      product:
-        description: "Product (either CargoWise or BorderWise)"
-        required: true
-        type: choice
-        options:
-          - CargoWise
-          - BorderWise
-      BranchName:
-        description: "Branch to create folder (Workflow creates new branch if missing)"
-        required: true
-        type: string
+      
+      
+
 
 permissions:
   contents: write
