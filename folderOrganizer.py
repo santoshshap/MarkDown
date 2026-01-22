@@ -16,7 +16,7 @@ def basename_from_src(src: str) -> str:
     return Path(path).name
 
 def validate_inputs(work_item: str, language: str) -> None:
-    if not work_item.startswith("WI00") or len(work_item) != 10 or not work_item[-8:].isdigit():
+    if not work_item.startswith("WI0") or len(work_item) != 10 or not work_item[-8:].isdigit():
         print("❌ WorkItemsNumber must look like WI00######## (10 chars)")
         sys.exit(1)
 
