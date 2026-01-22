@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       WorkItemsNumber:
-       description: |
-        Review the guides in this repo before use.
-        All fields must be completed.
-      
-        UPN Work Item number (e.g. WI01002345)
+        description: |
+          Review the guides in this repo before use.
+          All fields must be completed.
 
+          UPN Work Item number (e.g. WI01002345)
         required: true
         type: string
+
 
       BranchName:
         description: "Name of the new or existing branch for the UPN folder. "
