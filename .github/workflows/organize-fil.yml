@@ -99,7 +99,7 @@ jobs:
             --folder_to_organize "${{ inputs.FolderToOrganize }}" \
             --work_item "${{ inputs.WorkItemsNumber }}" \
             --language "${{ inputs.LanguageCode }}" \
-            --product "${{ inputs.product }}" \         
+            --product "${{ inputs.product }}" \
             --scan_root "_main"
 
       - name: Commit and push
