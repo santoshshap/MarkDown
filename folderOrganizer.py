@@ -120,7 +120,7 @@ def main() -> None:
 
     language = parse_language_choice(args.language)
     product = args.product.strip()
-    variant = args.language_variant
+    variant = args.variant
 
     validate_inputs(work_item, language)
 
