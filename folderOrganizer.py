@@ -15,7 +15,7 @@ def basename_from_src(src: str) -> str:
     return Path(path).name
 
 
-def validate_inputs(work_item: str, language: str) -> None:
+def validate_inputs(work_item: str, language: str, variant: str) -> None:
     # Accept WI + 8 digits (e.g. WI00123456, WI01002345)
     if not re.fullmatch(r"WI\d{8}", work_item):
         print("❌ WorkItemsNumber must look like WI######## (e.g., WI00123456 or WI01002345)")
@@ -24,6 +24,10 @@ def validate_inputs(work_item: str, language: str) -> None:
     # language is typically like EN-EN, EN-US etc. (we don't hard-validate further here)
     if not language:
         print("❌ Language code could not be parsed.")
+        sys.exit(1)
+
+    if not len(variant) < 2:
+        print("❌ Languave Variant should be blank or a single character")
         sys.exit(1)
 
 
@@ -122,7 +126,7 @@ def main() -> None:
     product = args.product.strip()
     variant = args.variant
 
-    validate_inputs(work_item, language)
+    validate_inputs(work_item, language, variant)
 
     create_root = Path(".")
     scan_root = Path(args.scan_root)
