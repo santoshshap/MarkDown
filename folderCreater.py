@@ -41,7 +41,7 @@ def main():
     language = language[language.find("(")+1 : language.rfind(")")]
     product = args.product
 
-    if not work_item.startswith("WI00") or len(work_item) != 10 or not work_item[-8:].isdigit():
+    if not work_item.startswith("WI0") or len(work_item) != 10 or not work_item[-8:].isdigit():
         print("❌ WorkItemsNumber must look like WI00######## (10 chars)")
         sys.exit(1)
         
