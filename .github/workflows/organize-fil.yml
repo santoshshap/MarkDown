@@ -105,6 +105,7 @@ jobs:
             --work_item "${{ inputs.WorkItemsNumber }}" \
             --language "${{ inputs.LanguageCode }}" \
             --product "${{ inputs.product }}" \
+            --language_variant "${{ inputs.LanguageVariant }}" \            
             --scan_root "_main"
 
       - name: Commit and push
