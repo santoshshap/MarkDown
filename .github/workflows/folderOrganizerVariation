@@ -1,0 +1,123 @@
+name: Folder and file organizer (Language Variant)
+
+on:
+  workflow_dispatch:
+    inputs:
+      WorkItemsNumber:
+        description: |
+          Review the guides in this repo before use.
+          All fields must be completed.
+          ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ‎‎‎
+          UPN Work Item number (e.g. WI01002345)
+        required: true
+        type: string
+                
+      BranchName:
+        description: "The name of the branch containing the new Update Note folder."
+        required: true
+        type: string
+
+      product:
+        description: "Product Category where the new Update Note folder was added."
+        required: true
+        type: choice
+        options:
+          - CargoWise
+          - BorderWise
+
+      FolderToOrganize:
+        description: "Current name of the new Update Note folder."
+        required: true
+        type: string
+
+      LanguageCode:
+        description: "Select the language code from the following options:"
+        required: true
+        type: choice
+        options:
+        - English (EN-EN)
+        - Chinese Simplified (ZH-CN)
+        - Chinese Traditional (ZH-TW)
+        - Dutch (NL-NL)
+        - English GB (EN-GB)
+        - English US (EN-US)
+        - French (FR-FR)
+        - German (DE-DE)
+        - Italian (IT-IT)
+        - Japanese (JA-JP)
+        - Korean (KR-KR)
+        - Polish (PL-PL)
+        - Portuguese (PT-PT)
+        - Portuguese Brazil (PT-BR)
+        - Spanish (ES-ES)
+        - Spanish Latin American (ES-LA)
+        - Turkish (TR-TR)
+
+      variant:
+        description: "Language Variation (A-Z)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  organize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main (source of truth for script)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Save organizer script from main
+        run: |
+          cp folderOrganizer.py /tmp/folderOrganizer.py
+
+      - name: Switch/create target branch
+        run: |
+          set -e
+          BR="${{ inputs.BranchName }}"
+          git fetch origin "$BR" || true
+          if git ls-remote --exit-code --heads origin "$BR" > /dev/null 2>&1; then
+            git checkout "$BR"
+            git pull origin "$BR"
+          else
+            git checkout -b "$BR"
+          fi
+
+      - name: Add main worktree for scanning
+        run: |
+          set -e
+          git fetch origin main
+          rm -rf _main || true
+          git worktree add _main origin/main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run organizer (main script)
+        run: |
+          python /tmp/folderOrganizer.py \
+            --folder_to_organize "${{ inputs.FolderToOrganize }}" \
+            --work_item "${{ inputs.WorkItemsNumber }}" \
+            --language "${{ inputs.LanguageCode }}" \
+            --product "${{ inputs.product }}" \
+            --product "${{ inputs.variant }}" \
+            --scan_root "_main"
+
+      - name: Commit and push
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Organize folder for ${{ inputs.WorkItemsNumber }}-${{ inputs.LanguageCode }}"
+          git push -u origin "${{ inputs.BranchName }}"
