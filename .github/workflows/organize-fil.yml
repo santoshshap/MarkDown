@@ -1,4 +1,4 @@
-name: Folder and file organizer
+name: 2. Folder and file organizer
 
 on:
   workflow_dispatch:
