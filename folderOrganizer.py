@@ -61,7 +61,6 @@ def get_next_folder_union(work_item: str, language: str, product: str, create_ro
 
     raise ValueError("No free letter (A–Z) left for this WorkItemsNumber")
 
-
 def get_folder_with_optional_variant(
     work_item: str,
     language: str,
@@ -71,16 +70,16 @@ def get_folder_with_optional_variant(
     variant: str | None,
 ) -> Path:
     """
-    New behavior:
+    Desired behavior:
     - If variant is blank/None => current process (next available letter)
-    - If variant is provided AND that variant folder does not exist (on branch OR main) => use variant
-    - Else => current process
+    - If variant is provided AND that exact variant folder exists (branch OR main) for this language => EXIT
+    - If variant is provided AND free => use it
     """
     if variant is None:
         variant = ""
     variant = variant.strip().upper()
 
-    # If blank -> current process
+    # Blank -> current process
     if variant == "":
         return get_next_folder_union(work_item, language, product, create_root, scan_root)
 
@@ -89,16 +88,19 @@ def get_folder_with_optional_variant(
         print("❌ LanguageVariant must be a single letter A–Z (or left blank).")
         sys.exit(1)
 
-    # If the variant path is free on both branch and main -> use it
-    if not path_exists_on_branch_or_main(work_item, variant, language, product, create_root, scan_root):
-        rel = candidate_rel_path(work_item, variant, language)
-        print(f"❌ Variant already exists for this language: {(create_root / product) / rel} "
-              f"(or in {scan_root / product / rel}). Aborting.")
+    rel = candidate_rel_path(work_item, variant, language)
+
+    # If it already exists on either branch or main -> STOP
+    if path_exists_on_branch_or_main(work_item, variant, language, product, create_root, scan_root):
+        print(
+            f"❌ Variant already exists for this language: {(create_root / product) / rel} "
+            f"(or in {scan_root / product / rel}). Aborting."
+        )
         sys.exit(1)
 
-    # Otherwise fallback to current process
-    rel = candidate_rel_path(work_item, variant, language)
+    # Otherwise safe to use requested variant
     return (create_root / product) / rel
+
 
 
 def parse_language_choice(raw: str) -> str:
