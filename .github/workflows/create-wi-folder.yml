@@ -1,4 +1,4 @@
-name: Folder and file creator
+name: 1. Folder and file creator
 
 on:
   workflow_dispatch:
