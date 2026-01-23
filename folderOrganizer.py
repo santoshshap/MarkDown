@@ -93,7 +93,7 @@ def get_folder_with_optional_variant(
     # If it already exists on either branch or main -> STOP
     if path_exists_on_branch_or_main(work_item, variant, language, product, create_root, scan_root):
         print(
-            f"❌ Variant already exists for this language: {(create_root / product) / rel} "
+            f"❌The language Variant already exists in this folder: {(create_root / product) / rel}. Please edit the existing file or delete the language variant and replace with new."
             f"(or in {scan_root / product / rel}). Aborting."
         )
         sys.exit(1)
