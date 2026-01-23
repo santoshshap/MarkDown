@@ -54,7 +54,7 @@ on:
         - Turkish (TR-TR)
 
       variant:
-        description: "Language Variation (A-Z)"
+        description: "Select the Update Note folder variant (A, B, C…) to save into:"
         required: true
         type: string
 
