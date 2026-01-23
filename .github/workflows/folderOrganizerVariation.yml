@@ -1,4 +1,4 @@
-name: Add translation folder and files
+name: 3. Add translation folder and files
 
 on:
   workflow_dispatch:
