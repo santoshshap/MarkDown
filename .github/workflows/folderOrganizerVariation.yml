@@ -1,4 +1,4 @@
-name: Folder and file organizer (Language Variant)
+name: Add translation folder and files
 
 on:
   workflow_dispatch:
