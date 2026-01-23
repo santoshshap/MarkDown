@@ -92,11 +92,13 @@ def get_folder_with_optional_variant(
     # If the variant path is free on both branch and main -> use it
     if not path_exists_on_branch_or_main(work_item, variant, language, product, create_root, scan_root):
         rel = candidate_rel_path(work_item, variant, language)
+        print(f"❌ Variant already exists for this language: {(create_root / product) / rel} "
+              f"(or in {scan_root / product / rel}). Aborting.")
         sys.exit(1)
-        #return (create_root / product) / rel
 
     # Otherwise fallback to current process
-    return get_next_folder_union(work_item, language, product, create_root, scan_root)
+    rel = candidate_rel_path(work_item, variant, language)
+    return (create_root / product) / rel
 
 
 def parse_language_choice(raw: str) -> str:
