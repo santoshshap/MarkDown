@@ -32,7 +32,7 @@ def main():
     p.add_argument("--work_item", required=True)
     p.add_argument("--language", required=True)
     p.add_argument("--product", required=True)
-    p.add_argument("--template", default="UpdateNoteTemplate.md")
+    p.add_argument("--template", default="Style and formatting template/UpdateNoteTemplate.md")
     args = p.parse_args()
 
     work_item = args.work_item.upper()
